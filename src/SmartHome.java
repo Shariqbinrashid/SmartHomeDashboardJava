@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+
 
 public class SmartHome {
 	private SmartPlug[] smartPlugs;
@@ -84,7 +84,7 @@ public class SmartHome {
 	}
 
 
-	public ArrayList<SmartPlug> serachPlug(Room room) {
+	public SmartPlug[] serachPlug(Room room) {
 		return room.getPluglist();
 	}
 	
@@ -109,28 +109,28 @@ public class SmartHome {
 	}
 	
 	
-	public void updateRoomplugs(int option,Room r) {
-		ArrayList<SmartPlug> plugs=r.getPluglist();
+	public void updateRoomplugs(int option,Room r,int o) {
+		SmartPlug [] plugs=r.getPluglist();
 
 		
 		
 		if(option==1) {
-			for(int k=0;k<plugs.size();k++) {
-				plugs.get(k).setStatus(false);
+			for(int k=0;k<plugs.length;k++) {
+				plugs[k].setStatus(false);
 			}
 		}
 		if(option==2) {
-			for(int k=0;k<plugs.size();k++) {
-				plugs.get(k).setStatus(true);
+			for(int k=0;k<plugs.length;k++) {
+				plugs[k].setStatus(true);
 			}
 		}
 		if(option==3) {
-			ConsoleEvents console = new ConsoleEvents();
-			int o=console.getInt("Select Plug from above");
 			
-			for(int k=0;k<plugs.size();k++) {
-				if(o==plugs.get(k).getUserPlugID())
-					plugs.get(k).toggle();
+			
+			
+			for(int k=0;k<plugs.length;k++) {
+				if(o==plugs[k].getUserPlugID())
+					plugs[k].toggle();
 			}
 		}
 		
@@ -138,9 +138,9 @@ public class SmartHome {
 	
 	public int getRoom(int plugID){
 		for(Room r:rooms ) {
-			ArrayList<SmartPlug> plugs=r.getPluglist();
-			for (int i=0;i<plugs.size();i++) {
-				if(plugID==plugs.get(i).getUserPlugID()) {
+			SmartPlug [] plugs=r.getPluglist();
+			for (int i=0;i<plugs.length;i++) {
+				if(plugID==plugs[i].getUserPlugID()) {
 					return(r.getRoomID());
 				}
 			}
@@ -158,7 +158,7 @@ public class SmartHome {
 				
 				for(SmartPlug p: smartPlugs) {
 					if(plugID==p.getUserPlugID()) {
-						r.pluglist.remove(p);
+						r.remove(p);
 					}
 					
 				}
@@ -177,7 +177,7 @@ public class SmartHome {
 				
 				for(SmartPlug p: smartPlugs) {
 					if(plugID==p.getUserPlugID()) {
-						r.pluglist.add(p);
+						r.add(p);
 					}
 					
 				}
@@ -269,7 +269,7 @@ public class SmartHome {
 	
 	public void addRooms(String name) {
 		increaseRooms();
-		if(RcurrentIndex >= plugsSize()) { return;}
+		if(RcurrentIndex >= roomsSize()) { return;}
 		
 		int ID=roomsSize();
 
@@ -290,33 +290,5 @@ public class SmartHome {
 	public void setUserPlugs(int userPlugs) {
 		this.userPlugs = userPlugs;
 	}
-/*
-	public void getAvaialablePlugs() {
-		for(int j = 0;j<plugsSize();j++){
-			if(smartPlugs[j].getUserPlugID()==-1)
-			System.out.println(smartPlugs[j].getID()+" "+smartPlugs[j].getName());
-		}
-	}
-	
-	public void getAvailableRooms() {
-		System.out.println("ROOMS AVAIALBLE:  ");
-		for(int i = 0;i<roomsSize();i++){
-			System.out.print(i+" - "+rooms[i].getRoomName()+" | ");		
-		}
-	}
-	
-	public void getUserDefinePlugs() {
-		for(int j = 0;j<plugsSize();j++){
-			if(smartPlugs[j].getID()==-2)
-			System.out.println(j+" "+smartPlugs[j].getName());
-		}
-	}
-	
-	public void viewAllPlugs() {
-		for(SmartPlug object : smartPlugs){		
-				if(object.getID()==-2)
-			System.out.println("SMartPlug |attached to: "+object.getName()+"            "+"|room: "+rooms[getRoom(object.getUserPlugID())].getRoomName()+" |ID: "+object.getUserPlugID()+"|"+"status: "+object.isStatus());		
-		}	
-	}
-*/
+
 }

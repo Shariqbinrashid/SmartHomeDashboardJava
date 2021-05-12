@@ -1,5 +1,5 @@
 import java.util.Scanner;
-import java.util.ArrayList;
+
 
 //Console Helper class
 public class ConsoleEvents {
@@ -134,10 +134,10 @@ public class ConsoleEvents {
 		Room[] roomslist=smth.getRooms();
 		for(int i=0;i<smth.roomsSize();i++) {		
 			out("Room: "+i);
-			ArrayList<SmartPlug> plugs=roomslist[i].getPluglist();	
-			for(int k=0;k<plugs.size();k++) {
-				if(plugs.get(k).getID()==-2)
-				out("SMartPlug |attached to: "+plugs.get(k).getName()+"            "+"|room: "+roomslist[i].getRoomName()+" |ID: "+plugs.get(k).getUserPlugID()+"|"+"status: "+plugs.get(k).isStatus());
+			SmartPlug[] plugs=roomslist[i].getPluglist();	
+			for(int k=0;k<plugs.length;k++) {
+				if(plugs[k].getID()==-2)
+				out("SMartPlug |attached to: "+plugs[k].getName()+"            "+"|room: "+roomslist[i].getRoomName()+" |ID: "+plugs[k].getUserPlugID()+"|"+"status: "+plugs[k].isStatus());
 			}				
 			
 		}
@@ -174,12 +174,12 @@ public class ConsoleEvents {
 				}
 				
 				int roomID = getInt("Please select rooms(integer only)");
-				ArrayList<SmartPlug> plugs=avaialbeRooms[roomID].getPluglist();
+				SmartPlug[] plugs=avaialbeRooms[roomID].getPluglist();
 				
-				for(int k=0;k<plugs.size();k++) {
+				for(int k=0;k<plugs.length;k++) {
 					
-					if(plugs.get(k).getID()==-2)
-					out("SMartPlug |attached to: "+plugs.get(k).getName()+"            "+"|room: "+roomslist[roomID].getRoomName()+" |ID: "+plugs.get(k).getUserPlugID()+"|"+"status: "+plugs.get(k).isStatus());
+					if(plugs[k].getID()==-2)
+					out("SMartPlug |attached to: "+plugs[k].getName()+"            "+"|room: "+roomslist[roomID].getRoomName()+" |ID: "+plugs[k].getUserPlugID()+"|"+"status: "+plugs[k].isStatus());
 				}
 				
 				out("ROOM LEVEL OPTIONS");
@@ -187,7 +187,11 @@ public class ConsoleEvents {
 				out("2-  Switch all plugs on in room");
 				out("3- Select a plug ID in the room and toggle its on/off status");
 				option=getInt("Select an option");
-				smth.updateRoomplugs(option,avaialbeRooms[roomID]);		
+				int o=0;
+				if(option==3) {
+					o=getInt("Select Plug from above");
+				}
+				smth.updateRoomplugs(option,avaialbeRooms[roomID],o);		
 				
 			break;
 			case 3:
