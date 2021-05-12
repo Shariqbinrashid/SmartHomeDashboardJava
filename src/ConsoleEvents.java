@@ -9,7 +9,7 @@ public class ConsoleEvents {
 		String s;
 		out(prompt);
 		try {
-			s = in.next();
+			s = in.nextLine();
 		} catch (Exception e){
 			return getString(prompt);
 		}
@@ -69,7 +69,7 @@ public class ConsoleEvents {
 	public void populate(SmartHome smth){
 		
 		
-		System.out.println("ENTER PLUG INFORMATION BELOW: ");
+		out("ENTER PLUG INFORMATION BELOW: ");
 		
 		
 		SmartPlug[] availablePlugs=smth.getSmartPlugs();
@@ -80,22 +80,30 @@ public class ConsoleEvents {
 		for(int k = 0;k<smth.getUserPlugs();k++){
 			
 			v=k+1;
-			System.out.println("Plug no.   "+v);
+			out("Plug no.   "+v);
 			
-			smth.getAvailableRooms();
+			
+			out("ROOMS AVAIALBLE:  ");
+			for(int i = 0;i<smth.roomsSize();i++){
+				System.out.print(i+" - "+smth.getRooms()[i].getRoomName()+" | ");		
+			}
+			
 			try {
 			roomID = getInt("Using the above list, please select the room for this plug (integer only)");
 			
-			System.out.println("AVAILABLE DEVICE LIST OPTIONS: ");
-			System.out.println("These are standard devices that can be attached to the smart plug: ");
+			out("AVAILABLE DEVICE LIST OPTIONS: ");
+			out("These are standard devices that can be attached to the smart plug: ");
 			
 			
-			smth.getAvaialablePlugs();
+			for(int j = 0;j<smth.plugsSize();j++){
+				if(smth.getSmartPlugs()[j].getUserPlugID()==-1)
+				out(smth.getSmartPlugs()[j].getID()+" "+smth.getSmartPlugs()[j].getName());
+			}
 			
 			plugID=getInt("Using the above list, please select the device to attach to the smart plug (integer only)");
 			
-			//Adding plug to room list
-			smth.getRooms()[roomID].addtoPluglist(availablePlugs[plugID]);
+			smth.DefinePlugs(availablePlugs[plugID].getName(),smth.getRooms()[roomID]);
+			
 			}
 			catch(Exception e) {
 				out("Invalid input/Exception");
@@ -128,7 +136,8 @@ public class ConsoleEvents {
 			out("Room: "+i);
 			ArrayList<SmartPlug> plugs=roomslist[i].getPluglist();	
 			for(int k=0;k<plugs.size();k++) {
-				out("SMartPlug |attached to: "+plugs.get(k).getName()+"            "+"|room: "+roomslist[i].getRoomName()+" |ID: "+plugs.get(k).getID()+"|"+"status: "+plugs.get(k).isStatus());
+				if(plugs.get(k).getID()==-2)
+				out("SMartPlug |attached to: "+plugs.get(k).getName()+"            "+"|room: "+roomslist[i].getRoomName()+" |ID: "+plugs.get(k).getUserPlugID()+"|"+"status: "+plugs.get(k).isStatus());
 			}				
 			
 		}
@@ -158,13 +167,19 @@ public class ConsoleEvents {
 			break;
 			case 2:
 				Room[] avaialbeRooms=smth.getRooms();		
-				smth.getAvailableRooms();
+				
+				out("ROOMS AVAIALBLE:  ");
+				for(int i = 0;i<smth.roomsSize();i++){
+					System.out.print(i+" - "+smth.getRooms()[i].getRoomName()+" | ");		
+				}
 				
 				int roomID = getInt("Please select rooms(integer only)");
 				ArrayList<SmartPlug> plugs=avaialbeRooms[roomID].getPluglist();
-
+				
 				for(int k=0;k<plugs.size();k++) {
-					out("SMartPlug |attached to: "+plugs.get(k).getName()+"            "+"|room: "+roomslist[roomID].getRoomName()+" |ID: "+plugs.get(k).getID()+"|"+"status: "+plugs.get(k).isStatus());
+					
+					if(plugs.get(k).getID()==-2)
+					out("SMartPlug |attached to: "+plugs.get(k).getName()+"            "+"|room: "+roomslist[roomID].getRoomName()+" |ID: "+plugs.get(k).getUserPlugID()+"|"+"status: "+plugs.get(k).isStatus());
 				}
 				
 				out("ROOM LEVEL OPTIONS");
@@ -173,9 +188,13 @@ public class ConsoleEvents {
 				out("3- Select a plug ID in the room and toggle its on/off status");
 				option=getInt("Select an option");
 				smth.updateRoomplugs(option,avaialbeRooms[roomID]);		
+				
 			break;
 			case 3:
-				smth.viewAllPlugs();
+				for(SmartPlug object : smth.getSmartPlugs()){		
+					if(object.getID()==-2)
+				out("SMartPlug |attached to: "+object.getName()+"            "+"|room: "+smth.getRooms()[smth.getRoom(object.getUserPlugID())].getRoomName()+" |ID: "+object.getUserPlugID()+"|"+"status: "+object.isStatus());		
+			}	
 				option=getInt("Please select plug (integer only)");
 				out("PLUG LEVEL OPTIONS");
 				out("1 - Switch plug off");
@@ -190,11 +209,14 @@ public class ConsoleEvents {
 				
 				if(op==3) {
 
-					System.out.println("AVAILABLE DEVICE LIST OPTIONS: ");
-					System.out.println("These are standard devices that can be attached to the smart plug: ");
+					out("AVAILABLE DEVICE LIST OPTIONS: ");
+					out("These are standard devices that can be attached to the smart plug: ");
 					
 					
-					smth.getAvaialablePlugs();
+					for(int j = 0;j<smth.plugsSize();j++){
+						if(smth.getSmartPlugs()[j].getUserPlugID()==-1)
+						out(smth.getSmartPlugs()[j].getID()+" "+smth.getSmartPlugs()[j].getName());
+					}
 					
 					
 					int plugID=getInt("Enter device to attach to smart plug (integer only");
@@ -202,7 +224,10 @@ public class ConsoleEvents {
 					
 				}
 				if(op==4) {
-					smth.getAvailableRooms();
+					out("ROOMS AVAIALBLE:  ");
+					for(int i = 0;i<smth.roomsSize();i++){
+						System.out.print(i+" - "+smth.getRooms()[i].getRoomName()+" | ");		
+					}
 					roomID = getInt("Please select rooms(integer only)");
 					smth.moveplug(option, roomID);
 					
@@ -212,21 +237,44 @@ public class ConsoleEvents {
 				break;
 			case 4:
 				out("SYSTEM LEVEL OPTIONS");
-				out("1 - add plug");
+				out("1 - add new plug to room");
 				out("2 - add attached devices");
 				out("3 - add rooms");
 				
 				option=getInt("Please select option (integer only)");
 
 				if(option==1) {
-					smth.addSmartPlug();
+				
+					
+					out("ROOMS AVAIALBLE:  ");
+					for(int i = 0;i<smth.roomsSize();i++){
+						System.out.print(i+" - "+smth.getRooms()[i].getRoomName()+" | ");		
+					}
+					
+					int rmID = getInt("Using the above list, please select the room for this plug (integer only)");
+					
+					out("AVAILABLE DEVICE LIST OPTIONS: ");
+					out("These are standard devices that can be attached to the smart plug: ");
+					
+					for(int j = 0;j<smth.plugsSize();j++){
+						if(smth.getSmartPlugs()[j].getUserPlugID()==-1)
+						out(smth.getSmartPlugs()[j].getID()+" "+smth.getSmartPlugs()[j].getName());
+					}
+					int plugID=getInt("Using the above list, please select the device to attach to the smart plug (integer only)");
+					smth.addSmartPlug(plugID,rmID);
+					
 				}
 				if(option==2) {
-					smth.addPlug();
+					
+					String name=getString("Enter name of attach device you want to add");
+					smth.addPlug(name);
+					
+					
 				}
 				
 				if(option==3) {
-					smth.addRooms();
+					String name=getString("Enter name of room");
+					smth.addRooms(name);
 				}
 				break;
 			default:

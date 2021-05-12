@@ -7,6 +7,10 @@ public class SmartHome {
 	private Room[] rooms;
 	private int roomID=0;
 	int userPlugs=0;
+	int ch=4;
+	
+	int userDefinePlugID=0;
+	
 	public SmartHome(int plugsSize,int roomSize) {
 		userPlugs=plugsSize;
 		rooms=new Room[roomSize];
@@ -31,7 +35,16 @@ public class SmartHome {
 	
 	public void add( boolean value,String name,int ID){
 		if(PcurrentIndex >= plugsSize()) { return;}
-		SmartPlug object = new SmartPlug(value, name,ID);
+		SmartPlug object = new SmartPlug(value, name,ID,-1);
+		smartPlugs[PcurrentIndex] = object;
+		PcurrentIndex++;
+	}
+	
+	public void addUserPlugs(String name,int ID,Room r){
+		increasePlugs();
+		if(PcurrentIndex >= plugsSize()) { return;}
+		SmartPlug object = new SmartPlug(false, name,-2,ID);
+		r.addtoPluglist(object);
 		smartPlugs[PcurrentIndex] = object;
 		PcurrentIndex++;
 	}
@@ -41,6 +54,12 @@ public class SmartHome {
 		for(int i = 0;i<names.length;i++){		
 			add(false,names[i],i);
 		}
+	}
+	
+	public void DefinePlugs(String names,Room r){
+			
+		addUserPlugs(names,userDefinePlugID,r);
+			userDefinePlugID++;
 	}
 	
 	
@@ -84,7 +103,8 @@ public class SmartHome {
 
 	public void updatePlugs(boolean k) {
 		for (int i=0;i<plugsSize();i++) {
-			smartPlugs[i].setStatus(k);
+			if(smartPlugs[i].getID()==-2)
+				smartPlugs[i].setStatus(k);
 		}
 	}
 	
@@ -109,7 +129,7 @@ public class SmartHome {
 			int o=console.getInt("Select Plug from above");
 			
 			for(int k=0;k<plugs.size();k++) {
-				if(o==plugs.get(k).getID())
+				if(o==plugs.get(k).getUserPlugID())
 					plugs.get(k).toggle();
 			}
 		}
@@ -120,7 +140,7 @@ public class SmartHome {
 		for(Room r:rooms ) {
 			ArrayList<SmartPlug> plugs=r.getPluglist();
 			for (int i=0;i<plugs.size();i++) {
-				if(plugID==plugs.get(i).getID()) {
+				if(plugID==plugs.get(i).getUserPlugID()) {
 					return(r.getRoomID());
 				}
 			}
@@ -137,7 +157,7 @@ public class SmartHome {
 				
 				
 				for(SmartPlug p: smartPlugs) {
-					if(plugID==p.getID()) {
+					if(plugID==p.getUserPlugID()) {
 						r.pluglist.remove(p);
 					}
 					
@@ -156,7 +176,7 @@ public class SmartHome {
 				
 				
 				for(SmartPlug p: smartPlugs) {
-					if(plugID==p.getID()) {
+					if(plugID==p.getUserPlugID()) {
 						r.pluglist.add(p);
 					}
 					
@@ -168,19 +188,11 @@ public class SmartHome {
 		
 	}
 	
-	public void viewAllPlugs() {
-		for(SmartPlug object : smartPlugs){		
-				if(getRoom(object.getID())!=-1)
-			System.out.println("SMartPlug |attached to: "+object.getName()+"            "+"|room: "+rooms[getRoom(object.getID())].getRoomName()+" |ID: "+object.getID()+"|"+"status: "+object.isStatus());
 
-			
-		}
-		
-	}
 	
 	public void changePlug(int plugID,int option) {
 		for(SmartPlug object : smartPlugs){	
-			if(object.getID()==plugID) {
+			if(object.getUserPlugID()==plugID) {
 				if (option==1) {
 					object.setStatus(false);
 				}
@@ -195,10 +207,8 @@ public class SmartHome {
 	
 	public void updateattach(int plugID,int change) {
 		for(SmartPlug object : smartPlugs){	
-			if(object.getID()==plugID) {
+			if(object.getUserPlugID()==plugID) {
 				object.setName(getNamewithId(change));
-				object.setID(change);
-				
 				object.setStatus(false);
 			}
 			
@@ -206,7 +216,7 @@ public class SmartHome {
 	}
 	public void moveplug(int change,int roomID) {
 		for(SmartPlug object : smartPlugs){	
-			if(object.getID()==change) {
+			if(object.getUserPlugID()==change) {
 				setRoom(change,roomID);
 			}
 			
@@ -224,17 +234,16 @@ public class SmartHome {
 	}
 	
 	
-	public void addPlug() {
+	public void addPlug(String name) {
 		increasePlugs();
-		ConsoleEvents console = new ConsoleEvents();
 		if(PcurrentIndex >= plugsSize()) { return;}
-		String name=console.getString("Enter name");
-		int ID=plugsSize();
+		
+		
 
-		SmartPlug object = new SmartPlug(false, name,ID-1);
+		SmartPlug object = new SmartPlug(false, name,ch+1,-1);
 		smartPlugs[PcurrentIndex] = object;
 		PcurrentIndex++;
-		
+		ch++;
 		
 	}
 	
@@ -244,43 +253,24 @@ public class SmartHome {
 		 smartPlugs = copy;
 	}
 	
-	public void addSmartPlug() {
-		ConsoleEvents console = new ConsoleEvents();
-
-
-		System.out.println("ROOMS AVAIALBLE:  ");
-		for(int i = 0;i<roomsSize();i++){
-			System.out.print(i+" - "+rooms[i].getRoomName()+" | ");		
-		
-		}
-		try {
-		roomID = console.getInt("Using the above list, please select the room for this plug (integer only)");
-		
-		System.out.println("AVAILABLE DEVICE LIST OPTIONS: ");
-		System.out.println("These are standard devices that can be attached to the smart plug: ");
-		
-		
-		for(int j = 0;j<plugsSize();j++){
-			System.out.println(j+" "+smartPlugs[j].getName());
+	public void addSmartPlug(int plugID,int rmID) {
+			
+		String name="";
+		for(int i=0;i<plugsSize();i++) {
+			if(smartPlugs[i].getID()==plugID)
+				 name=smartPlugs[i].getName();
 		}
 		
-		
-		int plugID=console.getInt("Using the above list, please select the device to attach to the smart plug (integer only)");
-		rooms[roomID].addtoPluglist(smartPlugs[plugID]);
-		}
-		catch(Exception e) {
-			console.out("Invalid input/Exception");
-		}
-		userPlugs++;
-		
+		addUserPlugs(name,userDefinePlugID,rooms[rmID]);
+		userDefinePlugID++;
+		userPlugs++;						
 	}
 	
 	
-	public void addRooms() {
+	public void addRooms(String name) {
 		increaseRooms();
-		ConsoleEvents console = new ConsoleEvents();
 		if(RcurrentIndex >= plugsSize()) { return;}
-		String name=console.getString("Enter name of room");
+		
 		int ID=roomsSize();
 
 		Room object = new Room( ID-1,name);
@@ -300,10 +290,11 @@ public class SmartHome {
 	public void setUserPlugs(int userPlugs) {
 		this.userPlugs = userPlugs;
 	}
-
+/*
 	public void getAvaialablePlugs() {
 		for(int j = 0;j<plugsSize();j++){
-			System.out.println(j+" "+smartPlugs[j].getName());
+			if(smartPlugs[j].getUserPlugID()==-1)
+			System.out.println(smartPlugs[j].getID()+" "+smartPlugs[j].getName());
 		}
 	}
 	
@@ -311,8 +302,21 @@ public class SmartHome {
 		System.out.println("ROOMS AVAIALBLE:  ");
 		for(int i = 0;i<roomsSize();i++){
 			System.out.print(i+" - "+rooms[i].getRoomName()+" | ");		
-		
 		}
 	}
 	
+	public void getUserDefinePlugs() {
+		for(int j = 0;j<plugsSize();j++){
+			if(smartPlugs[j].getID()==-2)
+			System.out.println(j+" "+smartPlugs[j].getName());
+		}
+	}
+	
+	public void viewAllPlugs() {
+		for(SmartPlug object : smartPlugs){		
+				if(object.getID()==-2)
+			System.out.println("SMartPlug |attached to: "+object.getName()+"            "+"|room: "+rooms[getRoom(object.getUserPlugID())].getRoomName()+" |ID: "+object.getUserPlugID()+"|"+"status: "+object.isStatus());		
+		}	
+	}
+*/
 }
