@@ -21,18 +21,7 @@ public class Room {
 	}
 	
 
-	public SmartPlug[] getPluglist() {
-		if(plugsSize()<1 ) {
-			SmartPlug [] empty = new SmartPlug[0];
-			
-			return empty;
-		}
-		else {
-			
-			return pluglist;
-		}
-			
-	}
+	
 
 
 
@@ -102,7 +91,18 @@ public class Room {
 
 	
 	
-	
+	public SmartPlug[] getPluglist() {
+		if(plugsSize()<1 ) {
+			SmartPlug [] empty = new SmartPlug[0];
+			
+			return empty;
+		}
+		else {
+			
+			return pluglist;
+		}
+			
+	}
 	
 	public int getRoomID() {
 		return roomID;

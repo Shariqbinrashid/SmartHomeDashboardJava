@@ -136,21 +136,25 @@ ConsoleEvent class act as a mediate between front end and backend , as its respo
 output to a user. It sends data to SmartHome class which returns data after processing and used to display results.
 ### Backend Logic:
 
-#### For SmartHome class:
-SmartHome class act as a main class for back end which have array of smart plugs and rooms. It displays 
-and update data from smart plug and room class.
-#### For Room class:
-I have used Room class which have Array of Smart plugs to give a relation between rooms and plugs, as 
-rooms can have 1 or more smart plugs and smart plug can be in more than one room.
-Once room is selected by user for particular plug , its object is store in list in room,For Smart Plug Class:
-Now main Logic of attach devices is built in this class. I have Used two unique IDs to differentiate 
-between Pre define Plugs and User define plugs. Pre define plugs are so called Attached devised , when
-attach device is added Its store UserPlugID as -1, and for User define plugs for each room I store ID as -2 
-for that plug.
-so whenever I need only attached devices I just iterate over array and ignore that SmartPlugs object 
-which have UserPlugID equal to -1.And for User define Plugs for each room, ignore Plugs which have ID -2.
-For updating data, I just match respective ID in array of Smart Plugs in SmartHome, and update 
-whatever us required.
+Firstly for front end, dashboard class which have main of application handles user interface with 
+the help of ConsoleEvents Class, which have responsibility of handling user input and giving output to 
+users.
+When programs starts, User enter Number of rooms in property and number of plugs he want in 
+property which store in 2 arrays in SmartHome class name smartsPlugs and rooms. Application has pre 
+define Plugs which is store in Attach devices array.
+Each plug and room has unique ID which is stored dynamically when user add room . To keep track of 
+each room plug, array l has been used in room class which store list of smartplug objects. So when user 
+assign Plug to any room its instance is stored or added in that room object list.Now to retrieve rooms and its corresponding plugs, we just iterate through rooms array and each room 
+array of smart plugs to display data.
+To update any Field in class, ID concept is used which just compare IDs of corresponding item and 
+update its data.
+To get Available Plugs and rooms we simply iterate over arrays.
+If user only want to view plugs that he has assigned to rooms or selected for his property, getRoom 
+function is which return Room ID of that plug ID otherwise -1.
+Now if return id is -1, we simply ignore that plug from Smart Plug list to display only user property plugs 
+which he has attached or user for his property.
+Now if user want to move plug to any other room , we delete that plug from room array and add to new 
+room list object
 
 # Conclusion:
 Keeping in view of company constraints, This Application can be scale up or can be modify as per their new needs. Each constraint or requirement is followed to build this Application so that it can be scale up to any need of company. For implementation, Client server split architecture can be helpful for any error tracing in future

@@ -2,12 +2,16 @@
 
 public class SmartHome {
 	private SmartPlug[] smartPlugs;
+	private AttachDevice[] devices;
+	private Room[] rooms;
+	
 	private int PcurrentIndex;
 	private int RcurrentIndex;
-	private Room[] rooms;
+	private int AcurrentIndex;
+	
+	
 	private int roomID=0;
 	int userPlugs=0;
-	int ch=4;
 	
 	int userDefinePlugID=0;
 	
@@ -16,46 +20,26 @@ public class SmartHome {
 		rooms=new Room[roomSize];
 		PcurrentIndex = 0;
 		RcurrentIndex=0;
+		smartPlugs = new SmartPlug[0];
 		}
 	
 	
 	public int plugsSize(){ return smartPlugs.length; }
 
 	public int roomsSize(){ return rooms.length; }
+	public int attachSize(){ return devices.length; }
 	
-	public void addRoom(String name){
-		
-		if(RcurrentIndex >= roomsSize()) { return;}
-		Room object = new Room(roomID,name);
-		rooms[RcurrentIndex] = object;
-		RcurrentIndex++;
-		roomID++;
+	
+	public AttachDevice[] getDevices() {
+		return devices;
 	}
-	
-	
-	public void add( boolean value,String name,int ID){
-		if(PcurrentIndex >= plugsSize()) { return;}
-		SmartPlug object = new SmartPlug(value, name,ID,-1);
-		smartPlugs[PcurrentIndex] = object;
-		PcurrentIndex++;
+
+
+	public void setDevices(AttachDevice[] devices) {
+		this.devices = devices;
 	}
-	
-	public void addUserPlugs(String name,int ID,Room r){
-		increasePlugs();
-		if(PcurrentIndex >= plugsSize()) { return;}
-		SmartPlug object = new SmartPlug(false, name,-2,ID);
-		r.addtoPluglist(object);
-		smartPlugs[PcurrentIndex] = object;
-		PcurrentIndex++;
-	}
-	
-	public void preDefine(String[] names){
-		smartPlugs = new SmartPlug[names.length];
-		for(int i = 0;i<names.length;i++){		
-			add(false,names[i],i);
-		}
-	}
-	
+
+
 	public void DefinePlugs(String names,Room r){
 			
 		addUserPlugs(names,userDefinePlugID,r);
@@ -103,7 +87,6 @@ public class SmartHome {
 
 	public void updatePlugs(boolean k) {
 		for (int i=0;i<plugsSize();i++) {
-			if(smartPlugs[i].getID()==-2)
 				smartPlugs[i].setStatus(k);
 		}
 	}
@@ -129,7 +112,7 @@ public class SmartHome {
 			
 			
 			for(int k=0;k<plugs.length;k++) {
-				if(o==plugs[k].getUserPlugID())
+				if(o==plugs[k].getID())
 					plugs[k].toggle();
 			}
 		}
@@ -140,7 +123,7 @@ public class SmartHome {
 		for(Room r:rooms ) {
 			SmartPlug [] plugs=r.getPluglist();
 			for (int i=0;i<plugs.length;i++) {
-				if(plugID==plugs[i].getUserPlugID()) {
+				if(plugID==plugs[i].getID()) {
 					return(r.getRoomID());
 				}
 			}
@@ -157,7 +140,7 @@ public class SmartHome {
 				
 				
 				for(SmartPlug p: smartPlugs) {
-					if(plugID==p.getUserPlugID()) {
+					if(plugID==p.getID()) {
 						r.remove(p);
 					}
 					
@@ -176,7 +159,7 @@ public class SmartHome {
 				
 				
 				for(SmartPlug p: smartPlugs) {
-					if(plugID==p.getUserPlugID()) {
+					if(plugID==p.getID()) {
 						r.add(p);
 					}
 					
@@ -192,7 +175,7 @@ public class SmartHome {
 	
 	public void changePlug(int plugID,int option) {
 		for(SmartPlug object : smartPlugs){	
-			if(object.getUserPlugID()==plugID) {
+			if(object.getID()==plugID) {
 				if (option==1) {
 					object.setStatus(false);
 				}
@@ -207,7 +190,7 @@ public class SmartHome {
 	
 	public void updateattach(int plugID,int change) {
 		for(SmartPlug object : smartPlugs){	
-			if(object.getUserPlugID()==plugID) {
+			if(object.getID()==plugID) {
 				object.setName(getNamewithId(change));
 				object.setStatus(false);
 			}
@@ -216,7 +199,7 @@ public class SmartHome {
 	}
 	public void moveplug(int change,int roomID) {
 		for(SmartPlug object : smartPlugs){	
-			if(object.getUserPlugID()==change) {
+			if(object.getID()==change) {
 				setRoom(change,roomID);
 			}
 			
@@ -224,7 +207,7 @@ public class SmartHome {
 	}
 	
 	public String getNamewithId(int ID) {
-		for(SmartPlug object : smartPlugs){	
+		for(AttachDevice object : devices){	
 			if(object.getID()==ID) {
 				return object.getName();
 			}
@@ -235,15 +218,14 @@ public class SmartHome {
 	
 	
 	public void addPlug(String name) {
-		increasePlugs();
-		if(PcurrentIndex >= plugsSize()) { return;}
+		increaseAttach();
+		if(AcurrentIndex >= attachSize()) { return;}
 		
 		
 
-		SmartPlug object = new SmartPlug(false, name,ch+1,-1);
-		smartPlugs[PcurrentIndex] = object;
-		PcurrentIndex++;
-		ch++;
+		AttachDevice object = new AttachDevice(attachSize()-1,name);
+		devices[AcurrentIndex] = object;
+		AcurrentIndex++;
 		
 	}
 	
@@ -252,13 +234,18 @@ public class SmartHome {
 		 System.arraycopy(smartPlugs, 0, copy, 0, smartPlugs.length);
 		 smartPlugs = copy;
 	}
+	public void increaseAttach() {
+		 AttachDevice[] copy=new AttachDevice[attachSize()+1];
+		 System.arraycopy(devices, 0, copy, 0, devices.length);
+		 devices = copy;
+	}
 	
 	public void addSmartPlug(int plugID,int rmID) {
 			
 		String name="";
-		for(int i=0;i<plugsSize();i++) {
-			if(smartPlugs[i].getID()==plugID)
-				 name=smartPlugs[i].getName();
+		for(int i=0;i<attachSize();i++) {
+			if(devices[i].getID()==plugID)
+				 name=devices[i].getName();
 		}
 		
 		addUserPlugs(name,userDefinePlugID,rooms[rmID]);
@@ -290,5 +277,39 @@ public class SmartHome {
 	public void setUserPlugs(int userPlugs) {
 		this.userPlugs = userPlugs;
 	}
+	
+public void addRoom(String name){
+		
+		if(RcurrentIndex >= roomsSize()) { return;}
+		Room object = new Room(roomID,name);
+		rooms[RcurrentIndex] = object;
+		RcurrentIndex++;
+		roomID++;
+	}
+	
+	
+	public void add(int ID,String name){
+		if(AcurrentIndex >= attachSize()) { return;}
+		AttachDevice object = new AttachDevice(ID,name);
+		devices[AcurrentIndex] = object;
+		AcurrentIndex++;
+	}
+	
+	public void addUserPlugs(String name,int ID,Room r){
+		increasePlugs();
+		if(PcurrentIndex >= plugsSize()) { return;}
+		SmartPlug object = new SmartPlug(false, name,ID);
+		r.addtoPluglist(object);
+		smartPlugs[PcurrentIndex] = object;
+		PcurrentIndex++;
+	}
+	
+	public void preDefine(String[] names){
+		devices = new AttachDevice[names.length];
+		for(int i = 0;i<names.length;i++){		
+			add(i,names[i]);
+		}
+	}
+	
 
 }
